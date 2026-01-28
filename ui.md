@@ -3,8 +3,8 @@
 ## Implementation Status
 - [x] Mobile App Shell (Phone Frame + Status Bar) ✅
 - [x] Screen 1: Home Screen ✅
-- [ ] Screen 2: Menu/Category
-- [ ] Screen 3: Item Detail
+- [x] Screen 2: Menu/Category ✅
+- [x] Screen 3: Item Detail ✅
 - [ ] Screen 4: Cart
 - [ ] Screen 5: Checkout
 - [ ] Screen 6: Notifications
@@ -206,7 +206,7 @@ export const viewport: Viewport = {
 
 ---
 
-## 2. MENU / CATEGORY SCREEN
+## 2. MENU / CATEGORY SCREEN ✅ IMPLEMENTED
 
 ```
 ┌─────────────────────────────────────┐
@@ -255,7 +255,7 @@ export const viewport: Viewport = {
 
 ---
 
-## 3. ITEM DETAIL SCREEN
+## 3. ITEM DETAIL SCREEN ✅ IMPLEMENTED
 
 ```
 ┌─────────────────────────────────────┐
