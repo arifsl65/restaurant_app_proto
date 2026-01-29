@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="45" fill="#EF4444"/>
+  <text x="50" y="45" font-family="Arial" font-size="20" font-weight="bold" fill="white" text-anchor="middle">-30%</text>
+  <text x="50" y="68" font-family="Arial" font-size="12" fill="white" text-anchor="middle">FEES</text>
+</svg>

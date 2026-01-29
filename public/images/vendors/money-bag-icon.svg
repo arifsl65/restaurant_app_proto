@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <ellipse cx="50" cy="70" rx="35" ry="25" fill="#22C55E"/>
+  <path d="M35 45 Q50 20 65 45" fill="#22C55E"/>
+  <path d="M40 45 L60 45 L55 35 L45 35 Z" fill="#16A34A"/>
+  <text x="50" y="78" font-family="Arial" font-size="28" font-weight="bold" fill="white" text-anchor="middle">£</text>
+</svg>

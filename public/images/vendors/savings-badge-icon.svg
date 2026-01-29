@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="45" fill="#22C55E"/>
+  <text x="50" y="42" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">SAVE</text>
+  <text x="50" y="62" font-family="Arial" font-size="20" font-weight="bold" fill="white" text-anchor="middle">£377K</text>
+  <text x="50" y="78" font-family="Arial" font-size="10" fill="white" text-anchor="middle">/year</text>
+</svg>
