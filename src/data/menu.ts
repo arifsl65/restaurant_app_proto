@@ -67,6 +67,24 @@ export const menuItems: MenuItem[] = [
     category: 'burgers',
     rating: 4.3,
   },
+  {
+    id: 'smash-burger',
+    name: 'Double Smash Burger',
+    description: 'Two smashed beef patties with melted cheese, pickles and burger sauce',
+    price: 6.99,
+    category: 'burgers',
+    tags: ['New'],
+    rating: 4.7,
+  },
+  {
+    id: 'spicy-bean-burger',
+    name: 'Spicy Bean Burger',
+    description: 'House made spicy bean patty with jalapeños, cheese and chipotle mayo',
+    price: 5.49,
+    category: 'burgers',
+    tags: ['Vegetarian', 'Spicy'],
+    rating: 4.4,
+  },
 
   // Wings
   {

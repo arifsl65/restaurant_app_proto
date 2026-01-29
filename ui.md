@@ -5,9 +5,9 @@
 - [x] Screen 1: Home Screen ✅
 - [x] Screen 2: Menu/Category ✅
 - [x] Screen 3: Item Detail ✅
-- [ ] Screen 4: Cart
-- [ ] Screen 5: Checkout
-- [ ] Screen 6: Notifications
+- [x] Screen 4: Cart ✅
+- [x] Screen 5: Checkout ✅
+- [x] Screen 6: Notifications ✅
 
 **Tech:** Next.js 16 + Tailwind 4 + TypeScript
 **Run:** `npm run dev` → http://localhost:3000

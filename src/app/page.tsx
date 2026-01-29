@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { categories, menuItems, deals, restaurant } from "@/data/menu";
+import { useCart } from "@/context/CartContext";
 import { LoadingImage } from "@/components/LoadingImage";
 import { BottomNav } from "@/components/BottomNav";
 import {
@@ -15,6 +16,7 @@ import {
 } from "@/components/icons";
 
 export default function Home() {
+  const { addItem } = useCart();
   const popularItems = menuItems.filter((item) => item.popular);
 
   const dealStyles = ["deal-orange", "deal-red", "deal-yellow"];
@@ -198,9 +200,25 @@ export default function Home() {
                   <span className="font-bold text-gray-800">
                     £{item.price.toFixed(2)}
                   </span>
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-white shadow-sm">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addItem({
+                        itemId: item.id,
+                        name: item.name,
+                        image: item.image,
+                        basePrice: item.price,
+                        quantity: 1,
+                        extras: [],
+                        extraNames: [],
+                        specialInstructions: "",
+                        totalPrice: item.price,
+                      });
+                    }}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-white shadow-sm press-effect hover:bg-orange-600 transition-colors"
+                  >
                     <PlusIcon />
-                  </span>
+                  </button>
                 </div>
               </Link>
             ))}

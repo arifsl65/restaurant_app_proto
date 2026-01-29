@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useRef, useEffect } from "react";
 import { categories, menuItems } from "@/data/menu";
+import { useCart } from "@/context/CartContext";
 import { LoadingImage } from "@/components/LoadingImage";
 import { BottomNav } from "@/components/BottomNav";
 import { ChevronLeft, SearchIcon, StarIcon, PlusIcon } from "@/components/icons";
@@ -13,6 +14,7 @@ export default function MenuCategoryPage() {
   const categoryId = params.category as string;
   const tabsRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef<HTMLAnchorElement>(null);
+  const { addItem } = useCart();
 
   // Get current category
   const currentCategory = categories.find((c) => c.id === categoryId);
@@ -152,7 +154,17 @@ export default function MenuCategoryPage() {
                     <button
                       onClick={(e) => {
                         e.preventDefault();
-                        // TODO: Add to cart logic
+                        addItem({
+                          itemId: item.id,
+                          name: item.name,
+                          image: item.image,
+                          basePrice: item.price,
+                          quantity: 1,
+                          extras: [],
+                          extraNames: [],
+                          specialInstructions: "",
+                          totalPrice: item.price,
+                        });
                       }}
                       className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500 text-white shadow-md press-effect hover:bg-orange-600 transition-colors"
                     >

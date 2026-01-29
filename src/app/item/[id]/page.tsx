@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { categories, menuItems } from "@/data/menu";
+import { useCart } from "@/context/CartContext";
 import { LoadingImage } from "@/components/LoadingImage";
 import { ChevronLeft, StarIcon, PlusIcon, MinusIcon, HeartIcon } from "@/components/icons";
 
@@ -19,6 +20,7 @@ export default function ItemDetailPage() {
   const params = useParams();
   const router = useRouter();
   const itemId = params.id as string;
+  const { addItem } = useCart();
 
   const [quantity, setQuantity] = useState(1);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
@@ -62,11 +64,19 @@ export default function ItemDetailPage() {
 
   // Handle add to cart
   const handleAddToCart = () => {
-    // TODO: Implement cart logic
-    console.log({
-      item: item.id,
+    const extraNames = selectedExtras.map((extraId) => {
+      const extra = extraOptions.find((e) => e.id === extraId);
+      return extra?.name || "";
+    }).filter(Boolean);
+
+    addItem({
+      itemId: item.id,
+      name: item.name,
+      image: item.image,
+      basePrice: item.price,
       quantity,
       extras: selectedExtras,
+      extraNames,
       specialInstructions,
       totalPrice,
     });
