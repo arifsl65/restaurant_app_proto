@@ -2,12 +2,15 @@
 
 ## Implementation Status
 - [x] Mobile App Shell (Phone Frame + Status Bar) ✅
+- [ ] Screen 0: Onboarding (Welcome/Intro screens)
 - [x] Screen 1: Home Screen ✅
 - [x] Screen 2: Menu/Category ✅
 - [x] Screen 3: Item Detail ✅
 - [x] Screen 4: Cart ✅
 - [x] Screen 5: Checkout ✅
 - [x] Screen 6: Notifications ✅
+- [x] Screen 7: Search ✅
+- [x] Screen 8: Profile ✅
 
 **Tech:** Next.js 16 + Tailwind 4 + TypeScript
 **Run:** `npm run dev` → http://localhost:3000
@@ -151,6 +154,47 @@ export const viewport: Viewport = {
 **PWA Meta Tags:**
 - `appleWebApp.capable: true` - Enables "Add to Home Screen"
 - `appleWebApp.statusBarStyle: "black-translucent"` - Blends status bar
+
+---
+
+## 0. ONBOARDING SCREEN (TODO)
+
+```
+┌─────────────────────────────────────┐
+│                                     │
+│                                     │
+│         ┌───────────────┐           │
+│         │               │           │
+│         │    🍔 🔥      │           │
+│         │               │           │
+│         └───────────────┘           │
+│                                     │
+│       Welcome to Spice Hut          │
+│                                     │
+│    Flame grilled goodness,          │
+│    delivered to your door           │
+│                                     │
+│           ● ○ ○                     │
+│                                     │
+│  ┌─────────────────────────────────┐│
+│  │          GET STARTED            ││
+│  └─────────────────────────────────┘│
+│                                     │
+│         Skip for now →              │
+│                                     │
+└─────────────────────────────────────┘
+```
+
+### Onboarding Flow (3 screens)
+1. **Welcome** - App intro with logo and tagline
+2. **Features** - Highlight key features (fast delivery, rewards, etc.)
+3. **Location** - Request delivery address or location permission
+
+### Features
+- Swipeable carousel with page indicators
+- Skip option
+- Shown only on first app launch (localStorage flag)
+- "Get Started" button on final screen
 
 ---
 
