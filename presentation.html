@@ -13,9 +13,12 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: #f5f5f5;
+      background: #1a1a1a;
       color: #1f2937;
       line-height: 1.6;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
     }
 
     /* Page setup for print */
@@ -26,15 +29,35 @@
 
     .page {
       background: white;
-      width: 190mm;
-      height: 277mm;
-      margin: 20px auto;
-      padding: 25px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 60px 80px;
+      box-sizing: border-box;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.3);
       page-break-after: always;
       page-break-inside: avoid;
+      position: absolute;
+      top: 0;
+      left: 0;
+      overflow-y: auto;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .page.active {
+      display: block;
+      opacity: 1;
       position: relative;
-      overflow: hidden;
+      z-index: 10;
+    }
+
+    .page.print-mode {
+      display: block !important;
+      opacity: 1 !important;
+      position: relative !important;
+      page-break-after: always;
     }
 
     .page:last-child {
@@ -762,6 +785,154 @@
     .mt-20 { margin-top: 20px; }
     .mt-30 { margin-top: 30px; }
     .mb-20 { margin-bottom: 20px; }
+
+    /* Slide Navigation Controls */
+    .slide-nav {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 1000;
+      background: rgba(0,0,0,0.8);
+      padding: 15px 30px;
+      border-radius: 50px;
+      backdrop-filter: blur(10px);
+    }
+
+    .slide-nav button {
+      background: #F97316;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+    }
+
+    .slide-nav button:hover {
+      background: #EA580C;
+      transform: scale(1.05);
+    }
+
+    .slide-nav button:disabled {
+      background: #4b5563;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .slide-counter {
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .slide-dots {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .slide-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4b5563;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .slide-dot.active {
+      background: #F97316;
+      transform: scale(1.2);
+    }
+
+    .slide-dot:hover {
+      background: #fb923c;
+    }
+
+    .progress-bar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(255,255,255,0.2);
+      z-index: 1001;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #F97316, #EA580C);
+      transition: width 0.3s ease;
+    }
+
+    .slide-hint {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .slide-hint kbd {
+      background: #4b5563;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin: 0 2px;
+    }
+
+    /* Scale content to fit viewport */
+    .page-content {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      padding-right: 20px;
+    }
+
+    .page-content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .page-content::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .page-content::-webkit-scrollbar-thumb {
+      background: #F97316;
+      border-radius: 4px;
+    }
+
+    @media print {
+      body {
+        background: white;
+        overflow: visible;
+      }
+      .slide-nav, .slide-hint, .progress-bar-container {
+        display: none !important;
+      }
+      .page {
+        display: block !important;
+        opacity: 1 !important;
+        position: relative !important;
+        max-width: none;
+        height: auto;
+        padding: 25px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1938,8 +2109,145 @@
       </a>
     </div>
 
-    <p class="date" style="color: rgba(255,255,255,0.7);">Contact: hello@spicehut.com</p>
+    <p class="date" style="color: rgba(255,255,255,0.7);">
+      <a href="https://www.datapin.co.uk" style="color: rgba(255,255,255,0.9); text-decoration: none;">www.datapin.co.uk</a>
+      &nbsp;|&nbsp; 07814703852
+    </p>
   </div>
+
+  <!-- Slide Navigation -->
+  <div class="progress-bar-container">
+    <div class="progress-bar-fill" id="progressBar"></div>
+  </div>
+
+  <div class="slide-hint">
+    <kbd>←</kbd> <kbd>→</kbd> Navigate &nbsp;|&nbsp; <kbd>P</kbd> Print
+  </div>
+
+  <div class="slide-nav">
+    <button id="prevBtn" onclick="prevSlide()">← Previous</button>
+    <div class="slide-dots" id="slideDots"></div>
+    <div class="slide-counter" id="slideCounter">1 / 15</div>
+    <button id="nextBtn" onclick="nextSlide()">Next →</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    let slides = [];
+    let totalSlides = 0;
+
+    function initSlides() {
+      slides = document.querySelectorAll('.page');
+      totalSlides = slides.length;
+      
+      slides.forEach((slide, index) => {
+        if (index === 0) slide.classList.add('active');
+        
+        // Wrap content for scrolling
+        const content = slide.innerHTML;
+        slide.innerHTML = '<div class="page-content">' + content + '</div>';
+      });
+      
+      createDots();
+      updateSlide();
+    }
+
+    // Create navigation dots
+    function createDots() {
+      const dotsContainer = document.getElementById('slideDots');
+      for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
+        dot.onclick = (e) => { e.stopPropagation(); goToSlide(i); };
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    // Update slide display
+    function updateSlide() {
+      slides.forEach((slide, index) => {
+        slide.classList.remove('active');
+        if (index === currentSlide) {
+          slide.classList.add('active');
+        }
+      });
+
+      // Update dots
+      document.querySelectorAll('.slide-dot').forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+      });
+
+      // Update counter
+      document.getElementById('slideCounter').textContent = 
+        (currentSlide + 1) + ' / ' + totalSlides;
+
+      // Update progress bar
+      const progress = ((currentSlide + 1) / totalSlides) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+
+      // Update buttons
+      document.getElementById('prevBtn').disabled = currentSlide === 0;
+      document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+    }
+
+    // Navigation functions
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+      event.stopPropagation();
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+      event.stopPropagation();
+    }
+
+    function goToSlide(index) {
+      currentSlide = index;
+      updateSlide();
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      } else if (e.key.toLowerCase() === 'p') {
+        togglePrintMode();
+      }
+    });
+
+    // Click to navigate on page
+    document.querySelectorAll('.page').forEach(page => {
+      page.addEventListener('click', (e) => {
+        const rect = page.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        if (x > rect.width / 2) {
+          nextSlide();
+        } else {
+          prevSlide();
+        }
+      });
+    });
+
+    // Print mode
+    function togglePrintMode() {
+      slides.forEach(slide => slide.classList.add('print-mode'));
+      document.querySelector('.slide-nav').style.display = 'none';
+      document.querySelector('.slide-hint').style.display = 'none';
+      document.querySelector('.progress-bar-container').style.display = 'none';
+      setTimeout(() => window.print(), 500);
+    }
+
+    // Initialize
+    initSlides();
+  </script>
 
 </body>
 </html>
