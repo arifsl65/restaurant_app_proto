@@ -898,6 +898,114 @@
       }
     }
 
+    /* Slide Navigation Controls */
+    .slide-nav {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 1000;
+      background: rgba(0,0,0,0.8);
+      padding: 15px 30px;
+      border-radius: 50px;
+      backdrop-filter: blur(10px);
+    }
+
+    .slide-nav button {
+      background: #F97316;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+    }
+
+    .slide-nav button:hover {
+      background: #EA580C;
+      transform: scale(1.05);
+    }
+
+    .slide-nav button:disabled {
+      background: #4b5563;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .slide-counter {
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .slide-dots {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .slide-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4b5563;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .slide-dot.active {
+      background: #F97316;
+      transform: scale(1.2);
+    }
+
+    .slide-dot:hover {
+      background: #fb923c;
+    }
+
+    .progress-bar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(255,255,255,0.2);
+      z-index: 1001;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #F97316, #EA580C);
+      transition: width 0.3s ease;
+    }
+
+    .slide-hint {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .slide-hint kbd {
+      background: #4b5563;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin: 0 2px;
+    }
+
     /* Print Styles */
     @media print {
       body {
@@ -2180,9 +2288,11 @@
       slides.forEach((slide, index) => {
         if (index === 0) slide.classList.add('active');
         
-        // Wrap content for scrolling
+        // Wrap only page content, not navigation
         const content = slide.innerHTML;
-        slide.innerHTML = '<div class="page-content">' + content + '</div>';
+        if (!slide.querySelector('.page-content')) {
+          slide.innerHTML = '<div class="page-content">' + content + '</div>';
+        }
       });
       
       createDots();
