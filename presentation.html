@@ -19,6 +19,8 @@
       overflow: hidden;
       margin: 0;
       padding: 0;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* Page setup for print */
@@ -44,6 +46,7 @@
       display: none;
       opacity: 0;
       transition: opacity 0.3s ease;
+      -webkit-overflow-scrolling: touch;
     }
 
     .page.active {
@@ -58,18 +61,6 @@
       opacity: 1 !important;
       position: relative !important;
       page-break-after: always;
-    }
-
-    .page:last-child {
-      page-break-after: avoid;
-    }
-
-    /* Prevent breaking inside elements */
-    .phone-container, .phone, .stats-row, .comparison,
-    .customer-card, .menu-grid, .demo-content, .flow-diagram,
-    .stat-box, .menu-item, .food-card, .timeline {
-      page-break-inside: avoid;
-      break-inside: avoid;
     }
 
     /* Cover Page */
@@ -712,6 +703,201 @@
       box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
     }
 
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      .page {
+        padding: 50px 20px 80px 20px;
+        width: 100%;
+        height: 100vh;
+      }
+
+      .page-content {
+        transform: scale(0.85);
+        transform-origin: top center;
+        width: 117.6%;
+      }
+
+      .cover h1 { font-size: 32px !important; }
+      .cover .tagline { font-size: 16px !important; }
+      .cover .subtitle { font-size: 20px !important; }
+      .cover .description { font-size: 14px !important; }
+      .cover-logo { width: 80px !important; height: 80px !important; }
+
+      h2 { font-size: 18px !important; }
+      h3 { font-size: 16px !important; }
+
+      .section-header h2 { font-size: 20px !important; }
+      .section-header { padding: 20px 15px !important; margin: -20px -20px 15px -20px !important; }
+
+      .phone-container {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .phone {
+        width: 140px;
+        margin: 10px;
+      }
+
+      .phone-screen { height: 280px; }
+
+      .stats-row {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .stat-box {
+        padding: 10px 15px;
+        flex: 1 1 calc(50% - 10px);
+      }
+
+      .stat-box .number { font-size: 20px; }
+      .stat-box .label { font-size: 9px; }
+
+      .comparison {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .comparison-card { max-width: none; }
+
+      .flow-diagram {
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .flow-step { min-width: 60px; padding: 8px; }
+      .flow-step .icon { font-size: 18px; }
+      .flow-step .label { font-size: 7px; }
+      .flow-arrow { font-size: 14px; }
+
+      .menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .menu-item img { height: 60px; }
+      .menu-item-info h4 { font-size: 9px; }
+      .menu-item-info .price { font-size: 11px; }
+
+      .customer-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .customer-avatar { margin: 0 auto 8px; }
+
+      .checklist li { font-size: 10px; padding-left: 24px; }
+      .checklist li::before { width: 16px; height: 16px; font-size: 9px; }
+
+      .roi-table th, .roi-table td {
+        padding: 5px;
+        font-size: 9px;
+      }
+
+      .timeline { padding-left: 15px; }
+      .timeline-item::before { width: 8px; height: 8px; left: -19px; }
+      .timeline-item .time { font-size: 8px; }
+      .timeline-item .event { font-size: 9px; }
+
+      .cta-button {
+        padding: 12px 30px;
+        font-size: 14px;
+      }
+
+      .slide-nav {
+        padding: 10px 20px;
+        gap: 10px;
+        bottom: 10px;
+      }
+
+      .slide-nav button {
+        padding: 8px 14px;
+        font-size: 13px;
+      }
+
+      .slide-counter {
+        font-size: 12px;
+        min-width: 60px;
+      }
+
+      .slide-dots {
+        gap: 5px;
+      }
+
+      .slide-dot {
+        width: 8px;
+        height: 8px;
+      }
+
+      .slide-hint {
+        display: none;
+      }
+
+      .progress-bar-container {
+        height: 3px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page {
+        padding: 40px 15px 70px 15px;
+      }
+
+      .page-content {
+        transform: scale(0.75);
+        transform-origin: top center;
+        width: 133.3%;
+      }
+
+      .cover h1 { font-size: 28px !important; }
+      .cover .tagline { font-size: 14px !important; }
+      .cover .subtitle { font-size: 18px !important; }
+      .cover .description { font-size: 13px !important; }
+      .cover-logo { width: 60px !important; height: 60px !important; }
+
+      .phone {
+        width: 120px;
+        margin: 8px;
+      }
+
+      .phone-screen { height: 240px; }
+
+      .stat-box {
+        flex: 1 1 100%;
+        padding: 8px 12px;
+      }
+
+      .stat-box .number { font-size: 18px; }
+
+      .flow-diagram {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .flow-arrow { transform: rotate(90deg); }
+
+      .menu-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .slide-nav {
+        padding: 8px 15px;
+        gap: 8px;
+      }
+
+      .slide-nav button {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .slide-counter {
+        font-size: 11px;
+        min-width: 50px;
+      }
+    }
+
     /* Print Styles */
     @media print {
       body {
@@ -785,154 +971,6 @@
     .mt-20 { margin-top: 20px; }
     .mt-30 { margin-top: 30px; }
     .mb-20 { margin-bottom: 20px; }
-
-    /* Slide Navigation Controls */
-    .slide-nav {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      z-index: 1000;
-      background: rgba(0,0,0,0.8);
-      padding: 15px 30px;
-      border-radius: 50px;
-      backdrop-filter: blur(10px);
-    }
-
-    .slide-nav button {
-      background: #F97316;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 25px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-weight: 600;
-    }
-
-    .slide-nav button:hover {
-      background: #EA580C;
-      transform: scale(1.05);
-    }
-
-    .slide-nav button:disabled {
-      background: #4b5563;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .slide-counter {
-      color: white;
-      font-size: 14px;
-      font-weight: 600;
-      min-width: 80px;
-      text-align: center;
-    }
-
-    .slide-dots {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .slide-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #4b5563;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .slide-dot.active {
-      background: #F97316;
-      transform: scale(1.2);
-    }
-
-    .slide-dot:hover {
-      background: #fb923c;
-    }
-
-    .progress-bar-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: rgba(255,255,255,0.2);
-      z-index: 1001;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #F97316, #EA580C);
-      transition: width 0.3s ease;
-    }
-
-    .slide-hint {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(0,0,0,0.7);
-      color: white;
-      padding: 10px 15px;
-      border-radius: 8px;
-      font-size: 12px;
-      z-index: 1000;
-      backdrop-filter: blur(10px);
-    }
-
-    .slide-hint kbd {
-      background: #4b5563;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 11px;
-      margin: 0 2px;
-    }
-
-    /* Scale content to fit viewport */
-    .page-content {
-      width: 100%;
-      height: 100%;
-      overflow-y: auto;
-      padding-right: 20px;
-    }
-
-    .page-content::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .page-content::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 4px;
-    }
-
-    .page-content::-webkit-scrollbar-thumb {
-      background: #F97316;
-      border-radius: 4px;
-    }
-
-    @media print {
-      body {
-        background: white;
-        overflow: visible;
-      }
-      .slide-nav, .slide-hint, .progress-bar-container {
-        display: none !important;
-      }
-      .page {
-        display: block !important;
-        opacity: 1 !important;
-        position: relative !important;
-        max-width: none;
-        height: auto;
-        padding: 25px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -2109,10 +2147,7 @@
       </a>
     </div>
 
-    <p class="date" style="color: rgba(255,255,255,0.7);">
-      <a href="https://www.datapin.co.uk" style="color: rgba(255,255,255,0.9); text-decoration: none;">www.datapin.co.uk</a>
-      &nbsp;|&nbsp; 07814703852
-    </p>
+    <p class="date" style="color: rgba(255,255,255,0.7);">Contact: hello@spicehut.com</p>
   </div>
 
   <!-- Slide Navigation -->
@@ -2135,6 +2170,8 @@
     let currentSlide = 0;
     let slides = [];
     let totalSlides = 0;
+    let touchStartX = 0;
+    let touchEndX = 0;
 
     function initSlides() {
       slides = document.querySelectorAll('.page');
@@ -2150,6 +2187,7 @@
       
       createDots();
       updateSlide();
+      initTouch();
     }
 
     // Create navigation dots
@@ -2210,6 +2248,33 @@
     function goToSlide(index) {
       currentSlide = index;
       updateSlide();
+    }
+
+    // Touch support for swipe
+    function initTouch() {
+      document.querySelectorAll('.page').forEach(page => {
+        page.addEventListener('touchstart', (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        page.addEventListener('touchend', (e) => {
+          touchEndX = e.changedTouches[0].screenX;
+          handleSwipe();
+        }, { passive: true });
+      });
+    }
+
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      const diff = touchStartX - touchEndX;
+      
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+          nextSlide(); // Swipe left = next
+        } else {
+          prevSlide(); // Swipe right = previous
+        }
+      }
     }
 
     // Keyboard navigation
