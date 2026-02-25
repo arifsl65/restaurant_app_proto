@@ -1,0 +1,2428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spice Hut - Mobile App & Notification System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #1a1a1a;
+      color: #1f2937;
+      line-height: 1.6;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Page setup for print */
+    @page {
+      size: A4;
+      margin: 10mm;
+    }
+
+    .page {
+      background: white;
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 60px 80px;
+      box-sizing: border-box;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.3);
+      page-break-after: always;
+      page-break-inside: avoid;
+      position: absolute;
+      top: 0;
+      left: 0;
+      overflow-y: auto;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .page.active {
+      display: block;
+      opacity: 1;
+      position: relative;
+      z-index: 10;
+    }
+
+    .page.print-mode {
+      display: block !important;
+      opacity: 1 !important;
+      position: relative !important;
+      page-break-after: always;
+    }
+
+    /* Cover Page */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+    }
+
+    .cover-logo {
+      width: 120px;
+      height: 120px;
+      border-radius: 24px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 30px rgba(249, 115, 22, 0.3);
+    }
+
+    .cover h1 {
+      font-size: 48px;
+      font-weight: 800;
+      color: #F97316;
+      margin-bottom: 10px;
+    }
+
+    .cover .tagline {
+      font-size: 24px;
+      color: #78716c;
+      margin-bottom: 50px;
+    }
+
+    .cover .subtitle {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 15px;
+    }
+
+    .cover .description {
+      font-size: 18px;
+      color: #57534e;
+      max-width: 500px;
+      margin-bottom: 80px;
+    }
+
+    .cover .date {
+      font-size: 14px;
+      color: #a8a29e;
+      position: absolute;
+      bottom: 40px;
+    }
+
+    /* Section Headers */
+    .section-header {
+      background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+      color: white;
+      padding: 30px 25px;
+      text-align: center;
+      margin: -25px -25px 20px -25px;
+    }
+
+    .section-header h2 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .section-header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .section-number {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      line-height: 40px;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    /* Phone Frame */
+    .phone-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: nowrap;
+      padding: 15px 0;
+    }
+
+    .phone {
+      width: 160px;
+      background: #1a1a1a;
+      border-radius: 25px;
+      padding: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      flex-shrink: 0;
+    }
+
+    .phone-notch {
+      width: 60px;
+      height: 18px;
+      background: #1a1a1a;
+      border-radius: 0 0 12px 12px;
+      margin: 0 auto;
+      position: relative;
+      top: -1px;
+    }
+
+    .phone-screen {
+      background: #FFF7ED;
+      border-radius: 18px;
+      height: 320px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .phone-label {
+      text-align: center;
+      margin-top: 10px;
+      font-weight: 600;
+      color: #57534e;
+      font-size: 11px;
+    }
+
+    /* Screen Components */
+    .screen-header {
+      background: #FFF7ED;
+      padding: 8px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #fed7aa;
+      font-size: 10px;
+    }
+
+    .screen-header-title {
+      font-weight: 600;
+      font-size: 10px;
+    }
+
+    .screen-content {
+      padding: 8px;
+    }
+
+    .screen-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 6px 8px;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid #e5e5e5;
+      font-size: 7px;
+      color: #78716c;
+    }
+
+    .screen-nav span {
+      text-align: center;
+    }
+
+    .nav-active {
+      color: #F97316;
+      font-weight: 600;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      width: 100%;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .hero-overlay {
+      position: relative;
+    }
+
+    .hero-text {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .hero-text h3 {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .hero-text p {
+      font-size: 10px;
+    }
+
+    /* Categories */
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      margin: 6px 0;
+    }
+
+    .category {
+      text-align: center;
+      padding: 4px 2px;
+      background: white;
+      border-radius: 6px;
+      font-size: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .category-icon {
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    /* Food Card */
+    .food-card {
+      display: flex;
+      gap: 6px;
+      background: white;
+      padding: 6px;
+      border-radius: 8px;
+      margin-bottom: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .food-card img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .food-card-info {
+      flex: 1;
+    }
+
+    .food-card-info h4 {
+      font-size: 8px;
+      font-weight: 600;
+      margin-bottom: 1px;
+    }
+
+    .food-card-info p {
+      font-size: 6px;
+      color: #78716c;
+    }
+
+    .food-card-info .price {
+      font-size: 9px;
+      font-weight: 700;
+      color: #F97316;
+      margin-top: 2px;
+    }
+
+    /* Demo Pages */
+    .demo-page {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin: 12px 0;
+    }
+
+    .demo-header {
+      background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .demo-header h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .demo-header p {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .demo-content {
+      padding: 20px;
+    }
+
+    /* Stats */
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 15px 0;
+    }
+
+    .stat-box {
+      text-align: center;
+      padding: 15px 20px;
+      background: #f9fafb;
+      border-radius: 10px;
+    }
+
+    .stat-box .number {
+      font-size: 24px;
+      font-weight: 800;
+      color: #F97316;
+    }
+
+    .stat-box .label {
+      font-size: 10px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    /* Comparison */
+    .comparison {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .comparison-card {
+      flex: 1;
+      max-width: 220px;
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .comparison-card.bad {
+      background: #fef2f2;
+      border: 2px solid #fecaca;
+    }
+
+    .comparison-card.good {
+      background: #f0fdf4;
+      border: 2px solid #bbf7d0;
+    }
+
+    .comparison-card h4 {
+      font-size: 11px;
+      margin-bottom: 10px;
+      color: #6b7280;
+    }
+
+    .comparison-card .message {
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: left;
+      font-size: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .comparison-card .rate {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .comparison-card.bad .rate { color: #ef4444; }
+    .comparison-card.good .rate { color: #22c55e; }
+
+    /* Customer Cards */
+    .customer-card {
+      display: flex;
+      gap: 10px;
+      padding: 12px;
+      background: #f9fafb;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      align-items: flex-start;
+    }
+
+    .customer-avatar {
+      width: 36px;
+      height: 36px;
+      background: #e5e7eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .customer-info { flex: 1; }
+
+    .customer-info h4 {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .customer-info p {
+      font-size: 9px;
+      color: #6b7280;
+      line-height: 1.4;
+    }
+
+    .customer-badge {
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 8px;
+      font-weight: 600;
+    }
+
+    .badge-active { background: #dcfce7; color: #166534; }
+    .badge-risk { background: #fef9c3; color: #854d0e; }
+    .badge-churning { background: #fee2e2; color: #991b1b; }
+    .badge-vip { background: #fef3c7; color: #92400e; }
+
+    /* Progress Bar */
+    .progress-bar {
+      height: 12px;
+      background: #e5e7eb;
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 6px;
+    }
+
+    .progress-fill.low { background: #ef4444; width: 20%; }
+    .progress-fill.high { background: #22c55e; width: 75%; }
+
+    /* Menu Catalog */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .menu-item {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .menu-item img {
+      width: 100%;
+      height: 80px;
+      object-fit: cover;
+    }
+
+    .menu-item-info {
+      padding: 10px;
+    }
+
+    .menu-item-info h4 {
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .menu-item-info p {
+      font-size: 9px;
+      color: #6b7280;
+      margin-bottom: 5px;
+    }
+
+    .menu-item-info .price {
+      font-size: 13px;
+      font-weight: 700;
+      color: #F97316;
+    }
+
+    /* Timeline */
+    .timeline {
+      border-left: 2px solid #F97316;
+      padding-left: 18px;
+      margin: 12px 0;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 10px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -23px;
+      top: 3px;
+      width: 10px;
+      height: 10px;
+      background: #F97316;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    .timeline-item .time {
+      font-size: 9px;
+      color: #F97316;
+      font-weight: 600;
+    }
+
+    .timeline-item .event {
+      font-size: 10px;
+      color: #374151;
+    }
+
+    /* ROI Table */
+    .roi-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+    }
+
+    .roi-table th, .roi-table td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .roi-table th {
+      background: #f9fafb;
+      font-weight: 600;
+      font-size: 10px;
+    }
+
+    .roi-table td {
+      font-size: 10px;
+    }
+
+    .roi-table .change-positive {
+      color: #22c55e;
+      font-weight: 600;
+    }
+
+    .roi-table .change-negative {
+      color: #ef4444;
+      font-weight: 600;
+    }
+
+    /* Flow Diagram */
+    .flow-diagram {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+      margin: 20px 0;
+    }
+
+    .flow-step {
+      text-align: center;
+      padding: 12px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      min-width: 80px;
+    }
+
+    .flow-step .icon {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .flow-step .label {
+      font-size: 9px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .flow-arrow {
+      font-size: 18px;
+      color: #F97316;
+    }
+
+    /* Notification Mockup */
+    .notification-mockup {
+      background: white;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      margin: 10px auto;
+      max-width: 280px;
+    }
+
+    .notification-mockup .notif-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .notification-mockup .notif-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+    }
+
+    .notification-mockup .notif-app {
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .notification-mockup .notif-time {
+      font-size: 8px;
+      color: #9ca3af;
+      margin-left: auto;
+    }
+
+    .notification-mockup .notif-title {
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .notification-mockup .notif-body {
+      font-size: 9px;
+      color: #6b7280;
+    }
+
+    /* CTA Button */
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+      color: white;
+      padding: 15px 40px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      .page {
+        padding: 50px 20px 80px 20px;
+        width: 100%;
+        height: 100vh;
+      }
+
+      .page-content {
+        transform: scale(0.85);
+        transform-origin: top center;
+        width: 117.6%;
+      }
+
+      .cover h1 { font-size: 32px !important; }
+      .cover .tagline { font-size: 16px !important; }
+      .cover .subtitle { font-size: 20px !important; }
+      .cover .description { font-size: 14px !important; }
+      .cover-logo { width: 80px !important; height: 80px !important; }
+
+      h2 { font-size: 18px !important; }
+      h3 { font-size: 16px !important; }
+
+      .section-header h2 { font-size: 20px !important; }
+      .section-header { padding: 20px 15px !important; margin: -20px -20px 15px -20px !important; }
+
+      .phone-container {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .phone {
+        width: 140px;
+        margin: 10px;
+      }
+
+      .phone-screen { height: 280px; }
+
+      .stats-row {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .stat-box {
+        padding: 10px 15px;
+        flex: 1 1 calc(50% - 10px);
+      }
+
+      .stat-box .number { font-size: 20px; }
+      .stat-box .label { font-size: 9px; }
+
+      .comparison {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .comparison-card { max-width: none; }
+
+      .flow-diagram {
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .flow-step { min-width: 60px; padding: 8px; }
+      .flow-step .icon { font-size: 18px; }
+      .flow-step .label { font-size: 7px; }
+      .flow-arrow { font-size: 14px; }
+
+      .menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .menu-item img { height: 60px; }
+      .menu-item-info h4 { font-size: 9px; }
+      .menu-item-info .price { font-size: 11px; }
+
+      .customer-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .customer-avatar { margin: 0 auto 8px; }
+
+      .checklist li { font-size: 10px; padding-left: 24px; }
+      .checklist li::before { width: 16px; height: 16px; font-size: 9px; }
+
+      .roi-table th, .roi-table td {
+        padding: 5px;
+        font-size: 9px;
+      }
+
+      .timeline { padding-left: 15px; }
+      .timeline-item::before { width: 8px; height: 8px; left: -19px; }
+      .timeline-item .time { font-size: 8px; }
+      .timeline-item .event { font-size: 9px; }
+
+      .cta-button {
+        padding: 12px 30px;
+        font-size: 14px;
+      }
+
+      .slide-nav {
+        padding: 10px 20px;
+        gap: 10px;
+        bottom: 10px;
+      }
+
+      .slide-nav button {
+        padding: 8px 14px;
+        font-size: 13px;
+      }
+
+      .slide-counter {
+        font-size: 12px;
+        min-width: 60px;
+      }
+
+      .slide-dots {
+        gap: 5px;
+      }
+
+      .slide-dot {
+        width: 8px;
+        height: 8px;
+      }
+
+      .slide-hint {
+        display: none;
+      }
+
+      .progress-bar-container {
+        height: 3px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page {
+        padding: 40px 15px 70px 15px;
+      }
+
+      .page-content {
+        transform: scale(0.75);
+        transform-origin: top center;
+        width: 133.3%;
+      }
+
+      .cover h1 { font-size: 28px !important; }
+      .cover .tagline { font-size: 14px !important; }
+      .cover .subtitle { font-size: 18px !important; }
+      .cover .description { font-size: 13px !important; }
+      .cover-logo { width: 60px !important; height: 60px !important; }
+
+      .phone {
+        width: 120px;
+        margin: 8px;
+      }
+
+      .phone-screen { height: 240px; }
+
+      .stat-box {
+        flex: 1 1 100%;
+        padding: 8px 12px;
+      }
+
+      .stat-box .number { font-size: 18px; }
+
+      .flow-diagram {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .flow-arrow { transform: rotate(90deg); }
+
+      .menu-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .slide-nav {
+        padding: 8px 15px;
+        gap: 8px;
+      }
+
+      .slide-nav button {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .slide-counter {
+        font-size: 11px;
+        min-width: 50px;
+      }
+    }
+
+    /* Slide Navigation Controls */
+    .slide-nav {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 1000;
+      background: rgba(0,0,0,0.8);
+      padding: 15px 30px;
+      border-radius: 50px;
+      backdrop-filter: blur(10px);
+    }
+
+    .slide-nav button {
+      background: #F97316;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+    }
+
+    .slide-nav button:hover {
+      background: #EA580C;
+      transform: scale(1.05);
+    }
+
+    .slide-nav button:disabled {
+      background: #4b5563;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .slide-counter {
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .slide-dots {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .slide-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4b5563;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .slide-dot.active {
+      background: #F97316;
+      transform: scale(1.2);
+    }
+
+    .slide-dot:hover {
+      background: #fb923c;
+    }
+
+    .progress-bar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(255,255,255,0.2);
+      z-index: 1001;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #F97316, #EA580C);
+      transition: width 0.3s ease;
+    }
+
+    .slide-hint {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .slide-hint kbd {
+      background: #4b5563;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin: 0 2px;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+      }
+
+      .page {
+        box-shadow: none;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .no-print {
+        display: none;
+      }
+    }
+
+    /* Section Title */
+    .section-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 15px;
+    }
+
+    /* Checklist */
+    .checklist {
+      list-style: none;
+    }
+
+    .checklist li {
+      padding: 6px 0;
+      padding-left: 28px;
+      position: relative;
+      font-size: 11px;
+    }
+
+    .checklist li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 18px;
+      height: 18px;
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    /* Small Text */
+    .small-text {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .text-center { text-align: center; }
+    .mt-20 { margin-top: 20px; }
+    .mt-30 { margin-top: 30px; }
+    .mb-20 { margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1: Cover -->
+  <div class="page cover">
+    <img src="public/images/spicehut-logo.gif" alt="Spice Hut Logo" class="cover-logo">
+    <h1>SPICE HUT</h1>
+    <p class="tagline">Flame Grilled Goodness</p>
+
+    <p class="subtitle">Mobile App & AI Notification System</p>
+    <p class="description">
+      A complete solution for customer engagement, personalized marketing,
+      and automated order management.
+    </p>
+
+    <p class="date">Presentation Document • 2024</p>
+  </div>
+
+  <!-- PAGE 2: Executive Summary -->
+  <div class="page">
+    <p class="section-title">Executive Summary</p>
+    <h2>Transform Your Customer Engagement</h2>
+
+    <p style="font-size: 16px; color: #6b7280; margin-bottom: 30px;">
+      Spice Hut's new mobile app and AI-powered notification system will revolutionize
+      how you connect with customers, increasing orders and reducing churn.
+    </p>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="number">+490%</div>
+        <div class="label">Open Rate Increase</div>
+      </div>
+      <div class="stat-box">
+        <div class="number">£47K</div>
+        <div class="label">Additional Revenue/Year</div>
+      </div>
+      <div class="stat-box">
+        <div class="number">-58%</div>
+        <div class="label">Churn Reduction</div>
+      </div>
+    </div>
+
+    <div class="mt-30">
+      <h3 style="font-size: 18px; margin-bottom: 15px;">What You Get</h3>
+      <ul class="checklist">
+        <li>Beautiful mobile app for iOS & Android</li>
+        <li>AI-powered personalized notifications</li>
+        <li>Customer intelligence dashboard</li>
+        <li>Automated marketing campaigns</li>
+        <li>Real-time order tracking</li>
+        <li>Loyalty rewards system</li>
+      </ul>
+    </div>
+
+    <div class="text-center mt-30">
+      <div class="flow-diagram">
+        <div class="flow-step">
+          <div class="icon">📱</div>
+          <div class="label">Mobile App</div>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">
+          <div class="icon">🧠</div>
+          <div class="label">AI Engine</div>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">
+          <div class="icon">💬</div>
+          <div class="label">Personalized<br>Messages</div>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">
+          <div class="icon">💰</div>
+          <div class="label">More Orders</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 3: Mobile App Overview -->
+  <div class="page">
+    <div class="section-header">
+      <span class="section-number">1</span>
+      <h2>Mobile App</h2>
+      <p>Beautiful, native experience for iOS & Android</p>
+    </div>
+
+    <div class="phone-container" style="margin-top: 30px;">
+      <!-- Home Screen -->
+      <div>
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="screen-header">
+              <span style="font-size: 11px;">📍 123 Main Street ▼</span>
+              <span>🔔 👤</span>
+            </div>
+            <div class="screen-content">
+              <div class="hero-overlay">
+                <img src="public/images/hero-banner.jpg" alt="Hero" class="hero-banner">
+                <div class="hero-text">
+                  <h3>🔥 SPICE HUT</h3>
+                  <p>⭐ 4.5 • 20-35 min</p>
+                </div>
+              </div>
+
+              <p style="font-size: 11px; font-weight: 600; margin: 10px 0 5px;">📂 CATEGORIES</p>
+              <div class="categories">
+                <div class="category">
+                  <div class="category-icon">🍔</div>
+                  Burgers
+                </div>
+                <div class="category">
+                  <div class="category-icon">🍗</div>
+                  Wings
+                </div>
+                <div class="category">
+                  <div class="category-icon">🌯</div>
+                  Wraps
+                </div>
+                <div class="category">
+                  <div class="category-icon">🥙</div>
+                  Doner
+                </div>
+              </div>
+
+              <p style="font-size: 11px; font-weight: 600; margin: 10px 0 5px;">⭐ POPULAR</p>
+              <div class="food-card">
+                <img src="public/images/lamb-donner-with-nan.jpg" alt="Lamb Donner">
+                <div class="food-card-info">
+                  <h4>Lamb Donner w/ Nan</h4>
+                  <p>⭐ 4.9 • Best Seller</p>
+                  <div class="price">£9.31</div>
+                </div>
+              </div>
+            </div>
+            <div class="screen-nav">
+              <span class="nav-active">🏠 Home</span>
+              <span>🔍 Search</span>
+              <span>🛒 Cart</span>
+              <span>👤 Profile</span>
+            </div>
+          </div>
+        </div>
+        <p class="phone-label">Home Screen</p>
+      </div>
+
+      <!-- Menu Screen -->
+      <div>
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="screen-header">
+              <span>← Burgers</span>
+              <span>🔍</span>
+            </div>
+            <div class="screen-content">
+              <div style="display: flex; gap: 8px; margin-bottom: 12px; font-size: 10px;">
+                <span style="padding: 5px 10px; background: #F97316; color: white; border-radius: 15px;">Burgers</span>
+                <span style="padding: 5px 10px; background: #f3f4f6; border-radius: 15px;">Wings</span>
+                <span style="padding: 5px 10px; background: #f3f4f6; border-radius: 15px;">Wraps</span>
+              </div>
+
+              <div class="food-card" style="flex-direction: column;">
+                <img src="public/images/gourmet-burger-meal.jpg" alt="Burger" style="width: 100%; height: 80px; border-radius: 10px;">
+                <div class="food-card-info" style="padding-top: 8px;">
+                  <h4>Gourmet Burger Meal</h4>
+                  <p>500g patty, fried onion, sauce</p>
+                  <p>⭐ 4.8 <span style="background: #fef3c7; padding: 2px 6px; border-radius: 8px; font-size: 8px;">Popular</span></p>
+                  <div class="price">£8.04</div>
+                </div>
+              </div>
+
+              <div class="food-card">
+                <img src="public/images/butter-chicken-burger.jpg" alt="Burger">
+                <div class="food-card-info">
+                  <h4>Butter Chicken Burger</h4>
+                  <p>⭐ 4.6 • Spicy</p>
+                  <div class="price">£7.46</div>
+                </div>
+              </div>
+            </div>
+            <div class="screen-nav">
+              <span>🏠 Home</span>
+              <span class="nav-active">🔍 Search</span>
+              <span>🛒 Cart</span>
+              <span>👤 Profile</span>
+            </div>
+          </div>
+        </div>
+        <p class="phone-label">Menu / Category</p>
+      </div>
+
+      <!-- Item Detail -->
+      <div>
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="screen-header">
+              <span>←</span>
+              <span>♡</span>
+            </div>
+            <div class="screen-content" style="padding: 0;">
+              <img src="public/images/lamb-donner-with-nan.jpg" alt="Item" style="width: 100%; height: 120px; object-fit: cover;">
+              <div style="padding: 12px;">
+                <h4 style="font-size: 14px; font-weight: 700;">Lamb Donner with Nan</h4>
+                <p style="font-size: 10px; color: #6b7280;">⭐ 4.9 (120+ reviews)</p>
+                <div style="display: flex; gap: 5px; margin: 8px 0;">
+                  <span style="background: #fef3c7; padding: 3px 8px; border-radius: 10px; font-size: 8px;">Best Seller</span>
+                  <span style="background: #dbeafe; padding: 3px 8px; border-radius: 10px; font-size: 8px;">Popular</span>
+                </div>
+                <p style="font-size: 10px; color: #6b7280; margin-bottom: 10px;">Tender lamb doner meat served on fresh nan bread with salad</p>
+
+                <p style="font-size: 10px; font-weight: 600; margin-bottom: 5px;">EXTRAS</p>
+                <div style="background: #f9fafb; padding: 8px; border-radius: 8px; font-size: 9px;">
+                  <div>☐ Extra meat +£2.00</div>
+                  <div>☐ Extra cheese +£0.80</div>
+                  <div>☐ Spicy sauce +£0.30</div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="background: #f3f4f6; padding: 5px 10px; border-radius: 8px;">-</span>
+                    <span style="font-weight: 600;">1</span>
+                    <span style="background: #f3f4f6; padding: 5px 10px; border-radius: 8px;">+</span>
+                  </div>
+                  <span style="background: #F97316; color: white; padding: 10px 20px; border-radius: 10px; font-size: 11px; font-weight: 600;">ADD £9.31</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="phone-label">Item Detail</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 4: More App Screens -->
+  <div class="page">
+    <p class="section-title">Mobile App</p>
+    <h2>Complete Order Journey</h2>
+
+    <div class="phone-container">
+      <!-- Cart Screen -->
+      <div>
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="screen-header">
+              <span>← Your Cart</span>
+              <span>🗑️</span>
+            </div>
+            <div class="screen-content">
+              <p style="font-size: 10px; color: #6b7280; margin-bottom: 10px;">🏪 Spice Hut • 20-35 min</p>
+
+              <div class="food-card">
+                <img src="public/images/lamb-donner-with-nan.jpg" alt="Item">
+                <div class="food-card-info">
+                  <h4>Lamb Donner w/ Nan</h4>
+                  <p>+ Extra meat</p>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+                    <span style="font-size: 10px; background: #f3f4f6; padding: 3px 8px; border-radius: 5px;">- 1 +</span>
+                    <span class="price">£11.31</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="food-card">
+                <img src="public/images/gourmet-burger-meal.jpg" alt="Item">
+                <div class="food-card-info">
+                  <h4>Gourmet Burger Meal</h4>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+                    <span style="font-size: 10px; background: #f3f4f6; padding: 3px 8px; border-radius: 5px;">- 1 +</span>
+                    <span class="price">£8.04</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="background: #f9fafb; padding: 10px; border-radius: 10px; margin-top: 10px; font-size: 10px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                  <span>Subtotal</span>
+                  <span>£19.35</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                  <span>Delivery fee</span>
+                  <span>£0.59</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-weight: 700; border-top: 1px solid #e5e5e5; padding-top: 5px;">
+                  <span>Total</span>
+                  <span>£19.94</span>
+                </div>
+              </div>
+
+              <div style="background: #F97316; color: white; text-align: center; padding: 12px; border-radius: 10px; margin-top: 10px; font-size: 12px; font-weight: 600;">
+                CHECKOUT • £19.94
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="phone-label">Cart</p>
+      </div>
+
+      <!-- Checkout Screen -->
+      <div>
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="screen-header">
+              <span>← Checkout</span>
+              <span></span>
+            </div>
+            <div class="screen-content">
+              <div style="background: #f9fafb; padding: 10px; border-radius: 10px; margin-bottom: 10px;">
+                <p style="font-size: 9px; color: #6b7280; margin-bottom: 3px;">📍 DELIVERY ADDRESS</p>
+                <p style="font-size: 11px; font-weight: 600;">123 Main Street</p>
+                <p style="font-size: 10px; color: #6b7280;">London, E1 4AB</p>
+              </div>
+
+              <div style="background: #f9fafb; padding: 10px; border-radius: 10px; margin-bottom: 10px;">
+                <p style="font-size: 9px; color: #6b7280; margin-bottom: 3px;">🕐 DELIVERY TIME</p>
+                <p style="font-size: 11px;">◉ ASAP (20-35 min)</p>
+                <p style="font-size: 10px; color: #9ca3af;">○ Schedule for later</p>
+              </div>
+
+              <div style="background: #f9fafb; padding: 10px; border-radius: 10px; margin-bottom: 10px;">
+                <p style="font-size: 9px; color: #6b7280; margin-bottom: 3px;">💳 PAYMENT METHOD</p>
+                <p style="font-size: 11px;">💳 •••• 4242</p>
+              </div>
+
+              <p style="font-size: 9px; color: #6b7280; margin: 10px 0 5px;">ORDER SUMMARY</p>
+              <div style="font-size: 10px;">
+                <div style="display: flex; justify-content: space-between;"><span>1x Lamb Donner</span><span>£11.31</span></div>
+                <div style="display: flex; justify-content: space-between;"><span>1x Gourmet Burger</span><span>£8.04</span></div>
+                <div style="display: flex; justify-content: space-between;"><span>Delivery</span><span>£0.59</span></div>
+                <div style="display: flex; justify-content: space-between; font-weight: 700; margin-top: 5px; padding-top: 5px; border-top: 1px solid #e5e5e5;"><span>Total</span><span>£19.94</span></div>
+              </div>
+
+              <div style="background: #F97316; color: white; text-align: center; padding: 12px; border-radius: 10px; margin-top: 10px; font-size: 12px; font-weight: 600;">
+                PLACE ORDER • £19.94
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="phone-label">Checkout</p>
+      </div>
+
+      <!-- Notifications Screen -->
+      <div>
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="screen-header">
+              <span>← Notifications</span>
+              <span></span>
+            </div>
+            <div class="screen-content">
+              <p style="font-size: 9px; color: #6b7280; margin-bottom: 5px;">TODAY</p>
+
+              <div style="background: white; padding: 10px; border-radius: 10px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 3px solid #F97316;">
+                <p style="font-size: 10px; font-weight: 600;">🚴 ORDER UPDATE</p>
+                <p style="font-size: 9px; color: #6b7280;">Your order is out for delivery!</p>
+                <p style="font-size: 9px; color: #6b7280;">Arriving in ~10 minutes</p>
+              </div>
+
+              <div style="background: white; padding: 10px; border-radius: 10px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 3px solid #F97316;">
+                <p style="font-size: 10px; font-weight: 600;">🎁 JUST FOR YOU, ARIF</p>
+                <p style="font-size: 9px; color: #6b7280;">You loved Lamb Donner last time</p>
+                <p style="font-size: 9px; color: #6b7280;">Get 15% off! Code: ARIF15</p>
+              </div>
+
+              <p style="font-size: 9px; color: #6b7280; margin: 10px 0 5px;">YESTERDAY</p>
+
+              <div style="background: white; padding: 10px; border-radius: 10px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <p style="font-size: 10px; font-weight: 600;">⭐ RATE YOUR ORDER</p>
+                <p style="font-size: 9px; color: #6b7280;">How was your Gourmet Burger?</p>
+                <p style="font-size: 12px;">☆ ☆ ☆ ☆ ☆</p>
+              </div>
+
+              <div style="background: white; padding: 10px; border-radius: 10px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <p style="font-size: 10px; font-weight: 600;">🏆 LOYALTY REWARD</p>
+                <p style="font-size: 9px; color: #6b7280;">You've earned 150 points!</p>
+                <div class="progress-bar" style="height: 8px;">
+                  <div class="progress-fill" style="width: 75%; background: #F97316;"></div>
+                </div>
+                <p style="font-size: 8px; color: #9ca3af;">150/200 pts to free drink</p>
+              </div>
+            </div>
+            <div class="screen-nav">
+              <span>🏠 Home</span>
+              <span>🔍 Search</span>
+              <span>🛒 Cart</span>
+              <span class="nav-active">👤 Profile</span>
+            </div>
+          </div>
+        </div>
+        <p class="phone-label">Notifications</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 5: The Problem -->
+  <div class="page">
+    <div class="section-header" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);">
+      <span class="section-number">2</span>
+      <h2>💸 The Problem</h2>
+      <p>Generic messages are costing you customers</p>
+    </div>
+
+    <div class="comparison" style="margin-top: 40px;">
+      <div class="comparison-card bad">
+        <h4>WHAT YOU SEND NOW</h4>
+        <div class="message">
+          <strong>🔔 Spice Hut</strong><br><br>
+          "Check out our latest deals! Order now for great savings."
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill low"></div>
+        </div>
+        <div class="rate">2%</div>
+        <p style="font-size: 12px; color: #6b7280;">open rate</p>
+      </div>
+
+      <div class="comparison-card good">
+        <h4>WHAT THEY WANT</h4>
+        <div class="message">
+          <strong>🔔 Spice Hut</strong><br><br>
+          "Arif, your Lamb Donner is waiting! 20% off just for you. Expires 6pm!"
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill high"></div>
+        </div>
+        <div class="rate">12%</div>
+        <p style="font-size: 12px; color: #6b7280;">open rate</p>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <h3 style="font-size: 20px; margin-bottom: 30px;">What This Costs You Every Year</h3>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="number" style="color: #dc2626;">£45K</div>
+          <div class="label">Lost Revenue</div>
+        </div>
+        <div class="stat-box">
+          <div class="number" style="color: #dc2626;">60%</div>
+          <div class="label">Customers Unsubscribe</div>
+        </div>
+        <div class="stat-box">
+          <div class="number" style="color: #dc2626;">1,200</div>
+          <div class="label">Customers Churned</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 6: Customer Intelligence -->
+  <div class="page">
+    <div class="section-header" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);">
+      <span class="section-number">3</span>
+      <h2>📊 Customer Intelligence</h2>
+      <p>We know every customer. We personalize for each one.</p>
+    </div>
+
+    <div style="padding: 20px;">
+      <div class="stat-box" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); margin-bottom: 30px;">
+        <div class="number" style="font-size: 48px;">1,847</div>
+        <div class="label" style="font-size: 16px;">Total Customers Tracked</div>
+        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; font-size: 13px;">
+          <span>🟢 847 Active</span>
+          <span>🟡 312 At Risk</span>
+          <span>🔴 203 Churning</span>
+          <span>⭐ 156 VIP</span>
+        </div>
+      </div>
+
+      <div class="customer-card">
+        <div class="customer-avatar">👤</div>
+        <div class="customer-info">
+          <h4>Arif Mohammed <span class="customer-badge badge-risk">🟡 At Risk</span></h4>
+          <p>Last Order: 7 days ago</p>
+          <p>Favorite: Lamb Donner with Nan (ordered 12x)</p>
+          <p>Avg Spend: £18.50 • Loyalty: 150 pts</p>
+          <p style="color: #F97316; font-weight: 600; margin-top: 8px;">💡 "Send 20% comeback offer featuring Lamb Donner"</p>
+        </div>
+      </div>
+
+      <div class="customer-card">
+        <div class="customer-avatar">👤</div>
+        <div class="customer-info">
+          <h4>Sarah Khan <span class="customer-badge badge-active">🟢 Active</span></h4>
+          <p>Last Order: 2 days ago</p>
+          <p>Favorite: Gourmet Burger Meal (ordered 8x)</p>
+          <p>Avg Spend: £12.30 • Loyalty: 89 pts</p>
+          <p style="color: #F97316; font-weight: 600; margin-top: 8px;">💡 "Send lunch deal at 11:30am tomorrow"</p>
+        </div>
+      </div>
+
+      <div class="customer-card">
+        <div class="customer-avatar">👤</div>
+        <div class="customer-info">
+          <h4>James Taylor <span class="customer-badge badge-churning">🔴 Churning</span></h4>
+          <p>Last Order: 14 days ago</p>
+          <p>Favorite: 20 Wings Bucket (ordered 5x)</p>
+          <p>Avg Spend: £22.10 • Loyalty: 67 pts</p>
+          <p style="color: #F97316; font-weight: 600; margin-top: 8px;">💡 "Urgent: 25% off + free drink to win back"</p>
+        </div>
+      </div>
+
+      <div class="customer-card">
+        <div class="customer-avatar">👤</div>
+        <div class="customer-info">
+          <h4>Emma Lewis <span class="customer-badge badge-vip">⭐ VIP</span></h4>
+          <p>Last Order: 1 day ago</p>
+          <p>Favorite: Chicken Wrap Meal (ordered 23x)</p>
+          <p>Avg Spend: £25.40 • Loyalty: 340 pts</p>
+          <p style="color: #F97316; font-weight: 600; margin-top: 8px;">💡 "Loyalty reward ready! Free item on next order"</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 7: Watch the Magic -->
+  <div class="page">
+    <div class="section-header" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);">
+      <span class="section-number">4</span>
+      <h2>✨ Watch the Magic</h2>
+      <p>See how we turn one customer into one perfect message</p>
+    </div>
+
+    <div style="padding: 30px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <!-- Step 1 -->
+        <div style="background: #f9fafb; padding: 25px; border-radius: 16px;">
+          <h4 style="color: #7c3aed; margin-bottom: 15px;">STEP 1: We Spot the Customer</h4>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="font-size: 48px;">😟</div>
+            <div>
+              <p style="font-weight: 600;">ARIF</p>
+              <p style="font-size: 14px; color: #6b7280;">Hasn't ordered in 7 days</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div style="background: #f9fafb; padding: 25px; border-radius: 16px;">
+          <h4 style="color: #7c3aed; margin-bottom: 15px;">STEP 2: We Think About Them</h4>
+          <div style="background: white; padding: 15px; border-radius: 12px; font-style: italic; color: #6b7280;">
+            💭 "Arif loves Lamb Donner and hasn't ordered in 7 days. Let's bring him back with 20% off his favorite!"
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div style="background: #f9fafb; padding: 25px; border-radius: 16px;">
+          <h4 style="color: #7c3aed; margin-bottom: 15px;">STEP 3: We Write the Message</h4>
+          <div style="background: white; padding: 15px; border-radius: 12px;">
+            <p style="font-size: 14px;">✍️ Writing...</p>
+            <p style="font-size: 16px; font-weight: 600; margin-top: 10px;">"Arif, we miss you! 🥙</p>
+            <p style="font-size: 14px; color: #6b7280;">Your Lamb Donner is waiting. 20% off today only!"</p>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div style="background: #f9fafb; padding: 25px; border-radius: 16px;">
+          <h4 style="color: #7c3aed; margin-bottom: 15px;">STEP 4: Ping! On Their Phone</h4>
+          <div class="notification-mockup" style="margin: 0; max-width: 100%;">
+            <div class="notif-header">
+              <img src="public/images/spicehut-logo.gif" alt="Logo" class="notif-icon">
+              <span class="notif-app">Spice Hut</span>
+              <span class="notif-time">now</span>
+            </div>
+            <div class="notif-title">Arif, we miss you! 🥙</div>
+            <div class="notif-body">Your Lamb Donner is waiting. 20% off today only!</div>
+          </div>
+          <p style="text-align: center; color: #22c55e; font-weight: 600; margin-top: 10px;">Arif taps → Orders! 🎉</p>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: center; gap: 40px; margin-top: 40px; padding: 20px; background: #f0fdf4; border-radius: 12px;">
+        <span style="font-weight: 600;">⚡ ALL AUTOMATIC</span>
+        <span style="font-weight: 600;">🚫 NO STAFF NEEDED</span>
+        <span style="font-weight: 600;">🕐 24/7</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 8: Works While You Sleep -->
+  <div class="page">
+    <div class="section-header" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+      <span class="section-number">5</span>
+      <h2>😴 Works While You Sleep</h2>
+      <p>Set it once. It runs forever. No staff needed.</p>
+    </div>
+
+    <div style="padding: 30px;">
+      <div style="background: #f9fafb; padding: 25px; border-radius: 16px; margin-bottom: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h4>LIVE NOW</h4>
+          <span style="background: #dcfce7; color: #166534; padding: 5px 15px; border-radius: 20px; font-size: 13px;">🟢 RUNNING</span>
+        </div>
+
+        <div style="font-size: 14px;">
+          <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">🕐 Just now &nbsp;&nbsp; ✅ Sent to Arif - "We miss you!"</div>
+          <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">🕐 1 min ago &nbsp;&nbsp; ✅ Sent to Emma - "VIP reward ready!"</div>
+          <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">🕐 2 min ago &nbsp;&nbsp; ✅ Sent to James - "25% off wings!"</div>
+          <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">🕐 3 min ago &nbsp;&nbsp; ✅ Sent to Sarah - "Lunch time deal!"</div>
+          <div style="padding: 10px 0;">🕐 4 min ago &nbsp;&nbsp; ✅ Sent to Mo - "Come back for 30% off"</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="number">312</div>
+          <div class="label">Messages Sent Today</div>
+        </div>
+        <div class="stat-box">
+          <div class="number">47</div>
+          <div class="label">Orders Today</div>
+        </div>
+        <div class="stat-box">
+          <div class="number">£890</div>
+          <div class="label">Revenue Today</div>
+        </div>
+      </div>
+
+      <h4 style="margin: 30px 0 20px;">What Happens Automatically</h4>
+      <div class="timeline">
+        <div class="timeline-item">
+          <span class="time">⏰ 6:00 AM</span>
+          <p class="event">System checks all 1,847 customers</p>
+        </div>
+        <div class="timeline-item">
+          <span class="time">🔍 6:01 AM</span>
+          <p class="event">Found 45 who need a nudge today</p>
+        </div>
+        <div class="timeline-item">
+          <span class="time">🍽️ 11:30 AM</span>
+          <p class="event">Sent lunch deals to 234 lunch regulars</p>
+        </div>
+        <div class="timeline-item">
+          <span class="time">🛒 All Day</span>
+          <p class="event">Caught 23 abandoned carts, sent reminders</p>
+        </div>
+        <div class="timeline-item">
+          <span class="time">🏆 All Day</span>
+          <p class="event">Celebrated 12 loyalty milestones</p>
+        </div>
+        <div class="timeline-item">
+          <span class="time">🍕 6:00 PM</span>
+          <p class="event">Sent Friday dinner deals to 412 customers</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 9: Results -->
+  <div class="page">
+    <div class="section-header" style="background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);">
+      <span class="section-number">6</span>
+      <h2>📈 Projected Results</h2>
+      <p>What personalized notifications will do for Spice Hut</p>
+    </div>
+
+    <div style="padding: 30px;">
+      <h4 style="margin-bottom: 20px;">Before vs After</h4>
+
+      <table class="roi-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Now</th>
+            <th>With AI</th>
+            <th>Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>📬 Open Rate</td>
+            <td>2.1%</td>
+            <td>12.4%</td>
+            <td class="change-positive">+490% ↑</td>
+          </tr>
+          <tr>
+            <td>👆 Click Rate</td>
+            <td>0.8%</td>
+            <td>6.2%</td>
+            <td class="change-positive">+675% ↑</td>
+          </tr>
+          <tr>
+            <td>🔄 Reorder Rate</td>
+            <td>15%</td>
+            <td>38%</td>
+            <td class="change-positive">+153% ↑</td>
+          </tr>
+          <tr>
+            <td>😢 Churn Rate</td>
+            <td>12%</td>
+            <td>5%</td>
+            <td class="change-negative">-58% ↓</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4 style="margin: 30px 0 20px;">💰 Projected Annual Impact</h4>
+
+      <div class="stats-row">
+        <div class="stat-box" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);">
+          <div class="number" style="font-size: 36px;">£47,250</div>
+          <div class="label">Additional Revenue Per Year</div>
+        </div>
+        <div class="stat-box">
+          <div class="number" style="font-size: 36px;">+285</div>
+          <div class="label">Extra Orders Per Month</div>
+        </div>
+        <div class="stat-box">
+          <div class="number" style="font-size: 36px;">140</div>
+          <div class="label">Customers Saved From Churn</div>
+        </div>
+      </div>
+
+      <div style="background: #f0fdf4; border: 2px solid #86efac; border-radius: 16px; padding: 25px; margin-top: 30px;">
+        <h4 style="color: #166534; margin-bottom: 15px;">✅ What You Get</h4>
+        <ul class="checklist">
+          <li>Every customer gets a personal message</li>
+          <li>System spots who needs a nudge</li>
+          <li>Messages write themselves</li>
+          <li>Works 24/7 without staff</li>
+          <li>Tracks what works, improves over time</li>
+          <li>You make more money</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 10: Menu Catalog -->
+  <div class="page">
+    <p class="section-title">Menu Catalog</p>
+    <h2>Our Delicious Menu</h2>
+
+    <h4 style="margin: 20px 0 15px;">🍔 Burgers</h4>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <img src="public/images/gourmet-burger-meal.jpg" alt="Gourmet Burger">
+        <div class="menu-item-info">
+          <h4>Gourmet Burger Meal</h4>
+          <p>500g patty, fried onion, sauce</p>
+          <span class="price">£8.04</span>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="public/images/butter-chicken-burger.jpg" alt="Butter Chicken Burger">
+        <div class="menu-item-info">
+          <h4>Butter Chicken Burger</h4>
+          <p>Butter fillet zinger burger</p>
+          <span class="price">£7.46</span>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="public/images/tower-burger.jpg" alt="Tower Burger">
+        <div class="menu-item-info">
+          <h4>Tower Burger</h4>
+          <p>Double patty, cheese, lettuce</p>
+          <span class="price">£5.46</span>
+        </div>
+      </div>
+    </div>
+
+    <h4 style="margin: 20px 0 15px;">🥙 Doner & Kebabs</h4>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <img src="public/images/lamb-donner-with-nan.jpg" alt="Lamb Donner">
+        <div class="menu-item-info">
+          <h4>Lamb Donner with Nan</h4>
+          <p>Tender lamb, fresh nan, salad</p>
+          <span class="price">£9.31</span>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="public/images/chicken-donner-with-nan.jpg" alt="Chicken Donner">
+        <div class="menu-item-info">
+          <h4>Chicken Donner with Nan</h4>
+          <p>Juicy chicken, fresh nan</p>
+          <span class="price">£8.50</span>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="public/images/lamb-biryani.jpg" alt="Lamb Biryani">
+        <div class="menu-item-info">
+          <h4>Lamb Biryani</h4>
+          <p>Aromatic rice, tender lamb</p>
+          <span class="price">£10.99</span>
+        </div>
+      </div>
+    </div>
+
+    <h4 style="margin: 20px 0 15px;">🍗 Wings</h4>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <img src="public/images/20-wings.jpg" alt="20 Wings">
+        <div class="menu-item-info">
+          <h4>20 Wings Bucket</h4>
+          <p>Party size, choice of sauce</p>
+          <span class="price">£14.99</span>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="public/images/10-wings.jpg" alt="10 Wings">
+        <div class="menu-item-info">
+          <h4>10 Wings</h4>
+          <p>Choice of sauce</p>
+          <span class="price">£8.99</span>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="public/images/6-wings.jpg" alt="6 Wings">
+        <div class="menu-item-info">
+          <h4>6 Wings</h4>
+          <p>Choice of sauce</p>
+          <span class="price">£5.99</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 11: Menu Catalog Continued -->
+  <div class="page">
+    <p class="section-title">Menu Catalog</p>
+    <h2>More Delicious Options</h2>
+
+    <h4 style="margin: 20px 0 15px;">🌯 Wraps</h4>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <img src="public/images/chicken-fillet-wrap.jpg" alt="Chicken Fillet Wrap">
+        <div class="menu-item-info">
+          <h4>Chicken Fillet Wrap</h4>
+          <p>Grilled chicken, fresh veggies</p>
+          <span class="price">£6.99</span>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="public/images/chicken-wrap-meal.jpg" alt="Chicken Wrap Meal">
+        <div class="menu-item-info">
+          <h4>Chicken Wrap Meal</h4>
+          <p>Wrap + chips + drink</p>
+          <span class="price">£8.99</span>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="public/images/chicken-strip-wrap.jpg" alt="Chicken Strip Wrap">
+        <div class="menu-item-info">
+          <h4>Chicken Strip Wrap</h4>
+          <p>Crispy strips, salad, sauce</p>
+          <span class="price">£6.49</span>
+        </div>
+      </div>
+    </div>
+
+    <h4 style="margin: 20px 0 15px;">🍟 Sides</h4>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <img src="public/images/peri-peri-chips.jpg" alt="Peri Peri Chips">
+        <div class="menu-item-info">
+          <h4>Peri Peri Chips</h4>
+          <p>Spicy seasoned fries</p>
+          <span class="price">£3.49</span>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="public/images/regular-chips.jpg" alt="Regular Chips">
+        <div class="menu-item-info">
+          <h4>Regular Chips</h4>
+          <p>Classic crispy fries</p>
+          <span class="price">£2.49</span>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="public/images/doner-rice-box.jpg" alt="Doner Rice Box">
+        <div class="menu-item-info">
+          <h4>Doner Rice Box</h4>
+          <p>Doner meat on rice</p>
+          <span class="price">£7.99</span>
+        </div>
+      </div>
+    </div>
+
+    <h4 style="margin: 20px 0 15px;">🥤 Drinks</h4>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <img src="public/images/coca-cola.jpg" alt="Coca Cola">
+        <div class="menu-item-info">
+          <h4>Coca Cola</h4>
+          <p>330ml can</p>
+          <span class="price">£1.50</span>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="public/images/fanta.jpg" alt="Fanta">
+        <div class="menu-item-info">
+          <h4>Fanta Orange</h4>
+          <p>330ml can</p>
+          <span class="price">£1.50</span>
+        </div>
+      </div>
+      <div class="menu-item">
+        <img src="public/images/water.jpg" alt="Water">
+        <div class="menu-item-info">
+          <h4>Still Water</h4>
+          <p>500ml bottle</p>
+          <span class="price">£1.00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 12: Payment Processing - The Problem -->
+  <div class="page">
+    <div class="section-header" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);">
+      <span class="section-number">7</span>
+      <h2>💸 Third-Party App Commissions</h2>
+      <p>What delivery platforms really cost your business</p>
+    </div>
+
+    <div style="padding: 15px;">
+      <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
+        <div style="text-align: center;">
+          <img src="public/images/vendors/ubereats-logo.svg" alt="Uber Eats" style="height: 35px; margin-bottom: 8px;">
+          <div style="background: #fee2e2; padding: 10px 20px; border-radius: 10px;">
+            <div style="font-size: 28px; font-weight: 800; color: #dc2626;">30-35%</div>
+            <div style="font-size: 9px; color: #991b1b;">Commission per order</div>
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <img src="public/images/vendors/deliveroo-logo.svg" alt="Deliveroo" style="height: 35px; margin-bottom: 8px;">
+          <div style="background: #fee2e2; padding: 10px 20px; border-radius: 10px;">
+            <div style="font-size: 28px; font-weight: 800; color: #dc2626;">25-35%</div>
+            <div style="font-size: 9px; color: #991b1b;">Commission per order</div>
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <img src="public/images/vendors/justeat-logo.svg" alt="Just Eat" style="height: 35px; margin-bottom: 8px;">
+          <div style="background: #fee2e2; padding: 10px 20px; border-radius: 10px;">
+            <div style="font-size: 28px; font-weight: 800; color: #dc2626;">14-28%</div>
+            <div style="font-size: 9px; color: #991b1b;">+ 50p + £295 setup</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: #fef2f2; border: 2px solid #fecaca; border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+        <h4 style="color: #dc2626; margin-bottom: 10px; font-size: 13px;">💰 What This Really Means (£20 Order)</h4>
+        <div style="display: flex; justify-content: space-between; font-size: 11px;">
+          <div style="text-align: center; flex: 1;">
+            <div style="font-weight: 600;">Uber Eats</div>
+            <div style="color: #dc2626; font-weight: 700;">-£6.00</div>
+            <div style="color: #6b7280;">You keep £14</div>
+          </div>
+          <div style="text-align: center; flex: 1;">
+            <div style="font-weight: 600;">Deliveroo</div>
+            <div style="color: #dc2626; font-weight: 700;">-£5.50</div>
+            <div style="color: #6b7280;">You keep £14.50</div>
+          </div>
+          <div style="text-align: center; flex: 1;">
+            <div style="font-weight: 600;">Just Eat</div>
+            <div style="color: #dc2626; font-weight: 700;">-£3.30</div>
+            <div style="color: #6b7280;">You keep £16.70</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 15px;">
+        <div style="font-size: 11px; color: #6b7280; margin-bottom: 8px;">VS YOUR OWN APP WITH</div>
+        <img src="public/images/vendors/stripe-logo.svg" alt="Stripe" style="height: 30px; margin-bottom: 8px;">
+        <div style="background: #dcfce7; border: 2px solid #86efac; border-radius: 12px; padding: 15px; display: inline-block;">
+          <div style="font-size: 32px; font-weight: 800; color: #16a34a;">1.5% + 20p</div>
+          <div style="font-size: 11px; color: #166534;">Only £0.50 fee on £20 order</div>
+          <div style="font-size: 13px; font-weight: 700; color: #166534; margin-top: 5px;">You keep £19.50! ✓</div>
+        </div>
+      </div>
+
+      <div style="background: #f9fafb; border-radius: 10px; padding: 12px;">
+        <h4 style="font-size: 11px; margin-bottom: 8px;">✅ Stripe Advantages</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 9px;">
+          <div>✓ No setup fees</div>
+          <div>✓ No monthly fees</div>
+          <div>✓ No contracts</div>
+          <div>✓ Cancel anytime</div>
+          <div>✓ Instant payouts available</div>
+          <div>✓ Accept all major cards</div>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;">
+          <img src="public/images/vendors/visa-logo.svg" alt="Visa" style="height: 20px;">
+          <img src="public/images/vendors/mastercard-logo.svg" alt="Mastercard" style="height: 20px;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 13: Multi-Branch Savings Calculator -->
+  <div class="page">
+    <div class="section-header" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);">
+      <span class="section-number">8</span>
+      <h2>🏪 Multi-Branch Savings</h2>
+      <p>Real numbers for Spice Hut with 5 branches</p>
+    </div>
+
+    <div style="padding: 15px;">
+      <div style="background: #f0fdf4; border-radius: 10px; padding: 12px; margin-bottom: 15px;">
+        <h4 style="font-size: 11px; color: #166534; margin-bottom: 8px;">📊 Your Business Assumptions</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 10px;">
+          <div><strong>Orders per day:</strong> 50/branch</div>
+          <div><strong>Average order:</strong> £18.50</div>
+          <div><strong>Days open:</strong> 350/year</div>
+          <div><strong>Branches:</strong> 5 locations</div>
+        </div>
+        <div style="text-align: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #86efac;">
+          <div style="font-size: 10px; color: #166534;">Annual Revenue (all branches)</div>
+          <div style="font-size: 24px; font-weight: 800; color: #16a34a;">£1,618,750</div>
+        </div>
+      </div>
+
+      <h4 style="font-size: 11px; margin-bottom: 10px;">💸 Annual Fees Comparison</h4>
+      <table style="width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 15px;">
+        <thead>
+          <tr style="background: #f3f4f6;">
+            <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb;">Platform</th>
+            <th style="padding: 8px; text-align: center; border-bottom: 2px solid #e5e7eb;">Rate</th>
+            <th style="padding: 8px; text-align: right; border-bottom: 2px solid #e5e7eb;">Annual Fees</th>
+            <th style="padding: 8px; text-align: right; border-bottom: 2px solid #e5e7eb;">You Keep</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background: #fef2f2;">
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><img src="public/images/vendors/ubereats-logo.svg" style="height: 15px;"></td>
+            <td style="padding: 8px; text-align: center; border-bottom: 1px solid #e5e7eb;">30%</td>
+            <td style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb; color: #dc2626; font-weight: 700;">£485,625</td>
+            <td style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb;">£1,133,125</td>
+          </tr>
+          <tr style="background: #fef2f2;">
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><img src="public/images/vendors/deliveroo-logo.svg" style="height: 15px;"></td>
+            <td style="padding: 8px; text-align: center; border-bottom: 1px solid #e5e7eb;">25%</td>
+            <td style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb; color: #dc2626; font-weight: 700;">£404,688</td>
+            <td style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb;">£1,214,062</td>
+          </tr>
+          <tr style="background: #fefce8;">
+            <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><img src="public/images/vendors/justeat-logo.svg" style="height: 15px;"></td>
+            <td style="padding: 8px; text-align: center; border-bottom: 1px solid #e5e7eb;">14%+</td>
+            <td style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb; color: #ca8a04; font-weight: 700;">£270,375</td>
+            <td style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb;">£1,348,375</td>
+          </tr>
+          <tr style="background: #f0fdf4;">
+            <td style="padding: 8px;"><img src="public/images/vendors/stripe-logo.svg" style="height: 15px;"> <strong>Your App</strong></td>
+            <td style="padding: 8px; text-align: center;">1.7%</td>
+            <td style="padding: 8px; text-align: right; color: #16a34a; font-weight: 700;">£41,781</td>
+            <td style="padding: 8px; text-align: right; color: #16a34a; font-weight: 700;">£1,576,969</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border: 3px solid #22c55e; border-radius: 15px; padding: 20px; text-align: center;">
+        <div style="font-size: 11px; color: #166534; margin-bottom: 5px;">🎯 ANNUAL SAVINGS WITH YOUR OWN APP</div>
+        <div style="font-size: 42px; font-weight: 900; color: #16a34a;">£377,169</div>
+        <div style="font-size: 12px; color: #166534; margin-top: 5px;">vs average third-party platform fees</div>
+
+        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; font-size: 10px;">
+          <div style="background: white; padding: 8px 15px; border-radius: 8px;">
+            <div style="font-weight: 700; color: #16a34a;">£75,434</div>
+            <div style="color: #6b7280;">per branch/year</div>
+          </div>
+          <div style="background: white; padding: 8px 15px; border-radius: 8px;">
+            <div style="font-weight: 700; color: #16a34a;">£6,286</div>
+            <div style="color: #6b7280;">per branch/month</div>
+          </div>
+          <div style="background: white; padding: 8px 15px; border-radius: 8px;">
+            <div style="font-weight: 700; color: #16a34a;">£209</div>
+            <div style="color: #6b7280;">per branch/day</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 14: Industry Stats & Benefits -->
+  <div class="page">
+    <div class="section-header" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);">
+      <span class="section-number">9</span>
+      <h2>📈 Proven Industry Results</h2>
+      <p>Real statistics from restaurants with their own apps</p>
+    </div>
+
+    <div style="padding: 15px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+        <div style="background: #eff6ff; border-radius: 12px; padding: 15px; text-align: center;">
+          <div style="font-size: 36px; font-weight: 900; color: #2563eb;">82%</div>
+          <div style="font-size: 10px; color: #1e40af;">of customers prefer ordering<br>direct from restaurant app</div>
+          <div style="font-size: 8px; color: #6b7280; margin-top: 5px;">Source: Toast Restaurant Data 2024</div>
+        </div>
+        <div style="background: #f0fdf4; border-radius: 12px; padding: 15px; text-align: center;">
+          <div style="font-size: 36px; font-weight: 900; color: #16a34a;">+35%</div>
+          <div style="font-size: 10px; color: #166534;">higher spend per transaction<br>on direct orders vs apps</div>
+          <div style="font-size: 8px; color: #6b7280; margin-top: 5px;">Source: ActiveMenus Research</div>
+        </div>
+        <div style="background: #fef3c7; border-radius: 12px; padding: 15px; text-align: center;">
+          <div style="font-size: 36px; font-weight: 900; color: #d97706;">67%</div>
+          <div style="font-size: 10px; color: #92400e;">higher customer lifetime value<br>with branded mobile app</div>
+          <div style="font-size: 8px; color: #6b7280; margin-top: 5px;">Source: Industry Analysis 2024</div>
+        </div>
+        <div style="background: #fce7f3; border-radius: 12px; padding: 15px; text-align: center;">
+          <div style="font-size: 36px; font-weight: 900; color: #db2777;">2.3x</div>
+          <div style="font-size: 10px; color: #9d174d;">order frequency increase<br>with loyalty app features</div>
+          <div style="font-size: 8px; color: #6b7280; margin-top: 5px;">Source: Restaurant Tech Report</div>
+        </div>
+      </div>
+
+      <h4 style="font-size: 12px; margin-bottom: 10px;">✅ What You Gain With Your Own App</h4>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 10px;">
+        <div style="background: #f9fafb; padding: 10px; border-radius: 8px; border-left: 3px solid #22c55e;">
+          <strong style="color: #16a34a;">100% Customer Data</strong><br>
+          <span style="color: #6b7280;">Build YOUR customer database, not theirs</span>
+        </div>
+        <div style="background: #f9fafb; padding: 10px; border-radius: 8px; border-left: 3px solid #22c55e;">
+          <strong style="color: #16a34a;">Direct Communication</strong><br>
+          <span style="color: #6b7280;">Push notifications, no middleman</span>
+        </div>
+        <div style="background: #f9fafb; padding: 10px; border-radius: 8px; border-left: 3px solid #22c55e;">
+          <strong style="color: #16a34a;">Brand Control</strong><br>
+          <span style="color: #6b7280;">Your branding, your experience</span>
+        </div>
+        <div style="background: #f9fafb; padding: 10px; border-radius: 8px; border-left: 3px solid #22c55e;">
+          <strong style="color: #16a34a;">Custom Promotions</strong><br>
+          <span style="color: #6b7280;">Run deals without platform approval</span>
+        </div>
+        <div style="background: #f9fafb; padding: 10px; border-radius: 8px; border-left: 3px solid #22c55e;">
+          <strong style="color: #16a34a;">Loyalty Programs</strong><br>
+          <span style="color: #6b7280;">Reward repeat customers directly</span>
+        </div>
+        <div style="background: #f9fafb; padding: 10px; border-radius: 8px; border-left: 3px solid #22c55e;">
+          <strong style="color: #16a34a;">Real-Time Analytics</strong><br>
+          <span style="color: #6b7280;">Know exactly what sells and when</span>
+        </div>
+      </div>
+
+      <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); color: white; border-radius: 12px; padding: 15px; margin-top: 15px; text-align: center;">
+        <div style="font-size: 11px; opacity: 0.9; margin-bottom: 5px;">APP DEVELOPMENT PAYS FOR ITSELF IN</div>
+        <div style="font-size: 32px; font-weight: 900;">2-3 MONTHS</div>
+        <div style="font-size: 10px; opacity: 0.8;">Based on commission savings alone</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 15: Call to Action -->
+  <div class="page cover" style="background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);">
+    <img src="public/images/spicehut-logo.gif" alt="Spice Hut Logo" class="cover-logo" style="box-shadow: 0 8px 30px rgba(0,0,0,0.3);">
+
+    <h1 style="color: white; font-size: 42px;">Ready to Grow?</h1>
+
+    <p style="color: rgba(255,255,255,0.9); font-size: 20px; max-width: 500px; margin-bottom: 50px;">
+      Let's build your mobile app and start saving £377K+ per year in commission fees.
+    </p>
+
+    <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 400px;">
+      <h3 style="font-size: 24px; margin-bottom: 20px;">Get Started Today</h3>
+
+      <div style="text-align: left; margin-bottom: 30px;">
+        <p style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">✓ Mobile App (iOS & Android)</p>
+        <p style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">✓ AI Notification System</p>
+        <p style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">✓ Stripe Payment Integration</p>
+        <p style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">✓ Customer Dashboard</p>
+        <p style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">✓ Loyalty Program</p>
+        <p style="padding: 10px 0;">✓ £377K+ Annual Savings</p>
+      </div>
+
+      <a href="#" class="cta-button" style="display: block; text-align: center;">
+        🚀 Let's Build This
+      </a>
+    </div>
+
+    <p class="date" style="color: rgba(255,255,255,0.7);">Contact: hello@spicehut.com</p>
+  </div>
+
+  <!-- Slide Navigation -->
+  <div class="progress-bar-container">
+    <div class="progress-bar-fill" id="progressBar"></div>
+  </div>
+
+  <div class="slide-hint">
+    <kbd>←</kbd> <kbd>→</kbd> Navigate &nbsp;|&nbsp; <kbd>P</kbd> Print
+  </div>
+
+  <div class="slide-nav">
+    <button id="prevBtn" onclick="prevSlide()">← Previous</button>
+    <div class="slide-dots" id="slideDots"></div>
+    <div class="slide-counter" id="slideCounter">1 / 15</div>
+    <button id="nextBtn" onclick="nextSlide()">Next →</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    let slides = [];
+    let totalSlides = 0;
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    function initSlides() {
+      slides = document.querySelectorAll('.page');
+      totalSlides = slides.length;
+      
+      slides.forEach((slide, index) => {
+        if (index === 0) slide.classList.add('active');
+        
+        // Wrap only page content, not navigation
+        const content = slide.innerHTML;
+        if (!slide.querySelector('.page-content')) {
+          slide.innerHTML = '<div class="page-content">' + content + '</div>';
+        }
+      });
+      
+      createDots();
+      updateSlide();
+      initTouch();
+    }
+
+    // Create navigation dots
+    function createDots() {
+      const dotsContainer = document.getElementById('slideDots');
+      for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
+        dot.onclick = (e) => { e.stopPropagation(); goToSlide(i); };
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    // Update slide display
+    function updateSlide() {
+      slides.forEach((slide, index) => {
+        slide.classList.remove('active');
+        if (index === currentSlide) {
+          slide.classList.add('active');
+        }
+      });
+
+      // Update dots
+      document.querySelectorAll('.slide-dot').forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+      });
+
+      // Update counter
+      document.getElementById('slideCounter').textContent = 
+        (currentSlide + 1) + ' / ' + totalSlides;
+
+      // Update progress bar
+      const progress = ((currentSlide + 1) / totalSlides) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+
+      // Update buttons
+      document.getElementById('prevBtn').disabled = currentSlide === 0;
+      document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+    }
+
+    // Navigation functions
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+      event.stopPropagation();
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+      event.stopPropagation();
+    }
+
+    function goToSlide(index) {
+      currentSlide = index;
+      updateSlide();
+    }
+
+    // Touch support for swipe
+    function initTouch() {
+      document.querySelectorAll('.page').forEach(page => {
+        page.addEventListener('touchstart', (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        page.addEventListener('touchend', (e) => {
+          touchEndX = e.changedTouches[0].screenX;
+          handleSwipe();
+        }, { passive: true });
+      });
+    }
+
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      const diff = touchStartX - touchEndX;
+      
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+          nextSlide(); // Swipe left = next
+        } else {
+          prevSlide(); // Swipe right = previous
+        }
+      }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      } else if (e.key.toLowerCase() === 'p') {
+        togglePrintMode();
+      }
+    });
+
+    // Click to navigate on page
+    document.querySelectorAll('.page').forEach(page => {
+      page.addEventListener('click', (e) => {
+        const rect = page.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        if (x > rect.width / 2) {
+          nextSlide();
+        } else {
+          prevSlide();
+        }
+      });
+    });
+
+    // Print mode
+    function togglePrintMode() {
+      slides.forEach(slide => slide.classList.add('print-mode'));
+      document.querySelector('.slide-nav').style.display = 'none';
+      document.querySelector('.slide-hint').style.display = 'none';
+      document.querySelector('.progress-bar-container').style.display = 'none';
+      setTimeout(() => window.print(), 500);
+    }
+
+    // Initialize
+    initSlides();
+  </script>
+
+</body>
+</html>

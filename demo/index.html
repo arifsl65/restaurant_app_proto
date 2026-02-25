@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spice Hut - AI Notification Demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    p {
+      font-size: 1.2rem;
+      color: #94a3b8;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+    .demo-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .demo-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 25px;
+      text-decoration: none;
+      color: white;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+    .demo-card:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: #f97316;
+      transform: translateY(-5px);
+    }
+    .demo-card .icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+    .demo-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: #f97316;
+    }
+    .demo-card p {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      margin-bottom: 0;
+    }
+    .back-link {
+      display: inline-block;
+      padding: 15px 40px;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3);
+    }
+    .back-link:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 30px rgba(249, 115, 22, 0.5);
+    }
+    .note {
+      margin-top: 40px;
+      padding: 20px;
+      background: rgba(249, 115, 22, 0.1);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      color: #fbbf24;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔔 Spice Hut Demo</h1>
+    <p>
+      Experience our AI-powered notification system that personalizes messages<br>
+      to increase customer engagement and reduce churn.
+    </p>
+
+    <div class="demo-links">
+      <a href="demo.html" class="demo-card">
+        <div class="icon">💸</div>
+        <h3>The Problem</h3>
+        <p>See how generic messages lose customers and revenue</p>
+      </a>
+
+      <a href="demo-customers.html" class="demo-card">
+        <div class="icon">👥</div>
+        <h3>Customer Intelligence</h3>
+        <p>AI-powered customer segmentation and churn prediction</p>
+      </a>
+
+      <a href="demo-auto.html" class="demo-card">
+        <div class="icon">✨</div>
+        <h3>Automated Campaigns</h3>
+        <p>Set it and forget it - automated personalized notifications</p>
+      </a>
+
+      <a href="demo-results.html" class="demo-card">
+        <div class="icon">📊</div>
+        <h3>Results & ROI</h3>
+        <p>Real metrics showing revenue increase and churn reduction</p>
+      </a>
+
+      <a href="demo-magic.html" class="demo-card">
+        <div class="icon">🧠</div>
+        <h3>AI Magic</h3>
+        <p>See how the AI engine creates personalized messages</p>
+      </a>
+    </div>
+
+    <a href="presentation.html" class="back-link">📱 View Full Presentation</a>
+
+    <div class="note">
+      ⚠️ This is a static demo. For the full interactive app experience, 
+      please run the development server locally.
+    </div>
+  </div>
+</body>
+</html>
